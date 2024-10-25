@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		
+		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+		
+		<!-- NuGet -->
+		<Authors>Toine de Boer</Authors>
+		<Copyright>Copyright © Toine de Boer and contributors</Copyright>
+		<IsPackable>True</IsPackable>
+		<PackageProjectUrl>https://github.com/Toine-db/MarkdownParser</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Toine-db/MarkdownParser</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>dotnet;markdown;</PackageTags>
+		<IncludeSymbols>True</IncludeSymbols>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Title>.NET Markdown Parser</Title>
+		<Description>Parser for Markdown text input and a Hierarchical UI structure output.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<DebugType>portable</DebugType>
+		<PackageIcon>icon.png</PackageIcon>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommonMark.NET" Version="0.15.1" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<None Include="..\..\LICENSE.md" Link="LICENSE.md">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="LICENSE.md">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="LICENSE-CommonMark.NET.md">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\nuget.png" PackagePath="icon.png" Pack="true" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
+
+</Project>

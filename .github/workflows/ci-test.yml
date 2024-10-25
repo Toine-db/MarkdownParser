@@ -1,0 +1,21 @@
+name: Run Tests for CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-sample-ci:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: dotnet build test\MarkdownParser.Test.sln -c Release
+    - name: Run Tests
+      run: dotnet test test\MarkdownParser.Test\MarkdownParser.Test.csproj
