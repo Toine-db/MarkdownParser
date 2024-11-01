@@ -72,5 +72,23 @@ namespace MarkdownParser
         /// <param name="placeholderName">placeholder string</param>
         /// <returns></returns>
         T GetPlaceholder(string placeholderName);
+
+        /// <summary>
+        /// a view that shows fenced code found in MD blocks starting with ```cs  
+        /// </summary>
+        /// <returns></returns>
+        T GetFencedCodeBlock(string content, string codeInfo);
+
+        /// <summary>
+        /// a view that shows indented code found in MD lines starting with at least 4 spaces
+        /// </summary>
+        /// <returns></returns>
+        T GetIndentedCodeBlock(string content);
+
+        /// <summary>
+        /// get a textual line break
+        /// </summary>
+        /// <returns></returns>
+        string GetTextualLineBreak();
     }
 }

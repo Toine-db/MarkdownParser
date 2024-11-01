@@ -98,4 +98,37 @@ public class MarkdownParserSectionsSpecs
         splittedViews[12].Should().Be("_False.2.1_textview");
         splittedViews[13].Should().Be("item2-3<listview<stackview<listview");
     }
+
+    [TestMethod]
+    public void When_parsing_codeblocks_it_should_output_code_views()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var markdown = FileReader.ReadFile("Sections.codeblocks.md");
+
+        var mockComponentSupplier = new StringComponentSupplier();
+        var parser = new MarkdownParser<string>(mockComponentSupplier);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var parseResult = parser.Parse(markdown);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        parseResult.Count.Should().Be(2);
+
+        var view0Parts = parseResult[0].Split('|');
+        view0Parts[0].Should().Be("fencedcodeview>");
+        view0Parts[1].Should().Be("(cs)");
+        view0Parts[2].Should().Be("var myNumber = 1;\r\nmyNumber++;");
+        view0Parts[3].Should().Be("<fencedcodeview");
+
+        var view1Parts = parseResult[1].Split('|');
+        view1Parts[0].Should().Be("indentedview>");
+        view1Parts[1].Should().Be("the first line for IndentedCode code block\r\nthe second line for IndentedCode code block\r\nthe third line for IndentedCode code block");
+        view1Parts[2].Should().Be("<indentedview");
+    }
 }

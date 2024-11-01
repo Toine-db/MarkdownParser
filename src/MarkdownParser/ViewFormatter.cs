@@ -69,17 +69,22 @@ namespace MarkdownParser
                     writer.StartAndFinalizeThematicBreak();
                     break;
                 case BlockTag.FencedCode:
+                    writer.StartAndFinalizeFencedCodeBlock(block.StringContent, block.FencedCodeData.Info);
+                    break;
                 case BlockTag.IndentedCode:
-                    // not supported
+                    writer.StartAndFinalizeIndentedCodeBlock(block.StringContent);
                     break;
                 case BlockTag.HtmlBlock:
-                    // TODO.....if needed
+                    // TODO
+                    var currentBlock3 = block;
+                    break;
                     //writer.StartBlock(BlockTag.Paragraph, block.StringContent.ToString());
                     //WriteBlockToView(block.FirstChild, writer);
                     //writer.FinalizeParagraphBlock();
                     break;
                 case BlockTag.ReferenceDefinition:
-                    // not supported
+                    // TODO
+                    var currentBlock4 = block;
                     break;
                 default:
                     throw new CommonMarkException("Block type " + block.Tag + " is not supported.", block);
@@ -114,7 +119,7 @@ namespace MarkdownParser
                     break;
                 case InlineTag.SoftBreak:
                 case InlineTag.LineBreak:
-                    writer.AddText(Environment.NewLine);
+                    writer.AddText(writer.GetTextualLineBreak());
                     break;
                 case InlineTag.Placeholder:
                     writer.StartAndFinalizePlaceholderBlock(inline.TargetUrl);

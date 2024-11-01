@@ -51,4 +51,19 @@ internal class StringComponentSupplier : IViewSupplier<string>
     {
         return $"placeholderview:{placeholderName}";
     }
+
+    public string GetFencedCodeBlock(string content, string codeInfo)
+    {
+        return $"fencedcodeview>|({codeInfo})|{content}|<fencedcodeview";
+    }
+
+    public string GetIndentedCodeBlock(string content)
+    {
+        return $"indentedview>|{content}|<indentedview";
+    }
+
+    public string GetTextualLineBreak()
+    {
+        return Environment.NewLine;
+    }
 }
