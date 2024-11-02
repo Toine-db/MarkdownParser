@@ -5,6 +5,12 @@ namespace MarkdownParser
     public interface IViewSupplier<T>
     {
         /// <summary>
+        /// get a textual line break
+        /// </summary>
+        /// <returns></returns>
+        string GetTextualLineBreak();
+
+        /// <summary>
         /// a default text view
         /// </summary>
         /// <param name="content"></param>
@@ -74,21 +80,21 @@ namespace MarkdownParser
         T GetPlaceholder(string placeholderName);
 
         /// <summary>
-        /// a view that shows fenced code found in MD blocks starting with ```cs  
+        /// a view that shows fenced code (found in MD blocks starting with ```cs )
         /// </summary>
         /// <returns></returns>
         T GetFencedCodeBlock(string content, string codeInfo);
 
         /// <summary>
-        /// a view that shows indented code found in MD lines starting with at least 4 spaces
+        /// a view that shows indented code (found in MD lines starting with at least 4 spaces)
         /// </summary>
         /// <returns></returns>
         T GetIndentedCodeBlock(string content);
 
         /// <summary>
-        /// get a textual line break
+        /// a view that shows html content
         /// </summary>
         /// <returns></returns>
-        string GetTextualLineBreak();
+        T GetHtmlBlock(string content);
     }
 }

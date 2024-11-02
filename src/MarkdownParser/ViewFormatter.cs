@@ -75,12 +75,7 @@ namespace MarkdownParser
                     writer.StartAndFinalizeIndentedCodeBlock(block.StringContent);
                     break;
                 case BlockTag.HtmlBlock:
-                    // TODO
-                    var currentBlock3 = block;
-                    break;
-                    //writer.StartBlock(BlockTag.Paragraph, block.StringContent.ToString());
-                    //WriteBlockToView(block.FirstChild, writer);
-                    //writer.FinalizeParagraphBlock();
+                    writer.StartAndFinalizeHtmlBlock(block.StringContent);
                     break;
                 case BlockTag.ReferenceDefinition:
                     // TODO

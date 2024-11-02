@@ -120,15 +120,70 @@ public class MarkdownParserSectionsSpecs
         //-----------------------------------------------------------------------------------------------------------
         parseResult.Count.Should().Be(2);
 
-        var view0Parts = parseResult[0].Split('|');
-        view0Parts[0].Should().Be("fencedcodeview>");
-        view0Parts[1].Should().Be("(cs)");
-        view0Parts[2].Should().Be("var myNumber = 1;\r\nmyNumber++;");
-        view0Parts[3].Should().Be("<fencedcodeview");
+        var codeViewComponentsGroup0 = parseResult[0].Split('|');
+        codeViewComponentsGroup0.Length.Should().Be(4);
+        codeViewComponentsGroup0[0].Should().Be("fencedcodeview>");
+        codeViewComponentsGroup0[1].Should().Be("(cs)");
+        codeViewComponentsGroup0[2].Should().Be("var myNumber = 1;\r\nmyNumber++;");
+        codeViewComponentsGroup0[3].Should().Be("<fencedcodeview");
 
-        var view1Parts = parseResult[1].Split('|');
-        view1Parts[0].Should().Be("indentedview>");
-        view1Parts[1].Should().Be("the first line for IndentedCode code block\r\nthe second line for IndentedCode code block\r\nthe third line for IndentedCode code block");
-        view1Parts[2].Should().Be("<indentedview");
+        var codeViewComponentsGroup1 = parseResult[1].Split('|');
+        codeViewComponentsGroup1.Length.Should().Be(3);
+        codeViewComponentsGroup1[0].Should().Be("indentedview>");
+        codeViewComponentsGroup1[1].Should().Be("the first line for IndentedCode code block\r\nthe second line for IndentedCode code block\r\nthe third line for IndentedCode code block");
+        codeViewComponentsGroup1[2].Should().Be("<indentedview");
+    }
+    
+    [TestMethod]
+    public void When_parsing_htmlblocks_it_should_output_html_views()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var markdown = FileReader.ReadFile("Sections.htmlblocks.md");
+
+        var mockComponentSupplier = new StringComponentSupplier();
+        var parser = new MarkdownParser<string>(mockComponentSupplier);
+
+        var newLineIndicator = mockComponentSupplier.GetTextualLineBreak();
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var parseResult = parser.Parse(markdown);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        parseResult.Count.Should().Be(2);
+
+        var htmlViewComponentsGroup0 = parseResult[0].Split('|');
+        htmlViewComponentsGroup0.Length.Should().Be(3);
+        htmlViewComponentsGroup0.First().Should().Be("htmlview>");
+        htmlViewComponentsGroup0.Last().Should().Be("<htmlview");
+
+        var firstHtmlViewContentGroup = htmlViewComponentsGroup0[1].Split(newLineIndicator);
+        firstHtmlViewContentGroup.Length.Should().Be(5);
+        firstHtmlViewContentGroup[0].Trim().Should().Be("<p>First text in block</p>");
+        firstHtmlViewContentGroup[1].Trim().Should().Be("<div>");
+        firstHtmlViewContentGroup[2].Trim().Should().Be("<h1>Header</h1>");
+        firstHtmlViewContentGroup[3].Trim().Should().Be("<p>Same block but nested element</p>");
+        firstHtmlViewContentGroup[4].Trim().Should().Be("</div>");
+
+        var htmlViewComponentsGroup1 = parseResult[1].Split('|');
+        htmlViewComponentsGroup1.Length.Should().Be(3);
+        htmlViewComponentsGroup1.First().Should().Be("htmlview>");
+        htmlViewComponentsGroup1.Last().Should().Be("<htmlview");
+
+        var secondHtmlViewContentGroup = htmlViewComponentsGroup1[1].Split(newLineIndicator);
+        secondHtmlViewContentGroup.Length.Should().Be(8);
+        secondHtmlViewContentGroup[0].Trim().Should().Be("<article>");
+        secondHtmlViewContentGroup[1].Trim().Should().Be("<header>");
+        secondHtmlViewContentGroup[2].Trim().Should().Be("<h1>A heading</h1>");
+        secondHtmlViewContentGroup[3].Trim().Should().Be("<p>Posted by John Doe</p>");
+        secondHtmlViewContentGroup[4].Trim().Should().Be("<p>Some additional information here</p>");
+        secondHtmlViewContentGroup[5].Trim().Should().Be("</header>");
+        secondHtmlViewContentGroup[6].Trim().Should().Be("<p>Lorem Ipsum...</p>");
+        secondHtmlViewContentGroup[7].Trim().Should().Be("</article>");
     }
 }

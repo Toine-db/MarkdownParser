@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using CommonMark.Syntax;
 
 namespace MarkdownParser
@@ -187,18 +186,26 @@ namespace MarkdownParser
 
         public void StartAndFinalizeFencedCodeBlock(StringContent content, string blockInfo)
         {
-            var parsedContent = ParseStringContentToString(content);
+            var parsedContent = StringContentToStringWithLineBreaks(content);
 
-            var codeBlock = ViewSupplier.GetFencedCodeBlock(parsedContent, blockInfo);
-            StoreView(codeBlock);
+            var blockView = ViewSupplier.GetFencedCodeBlock(parsedContent, blockInfo);
+            StoreView(blockView);
         }
 
         public void StartAndFinalizeIndentedCodeBlock(StringContent content)
         {
-            var parsedContent = ParseStringContentToString(content);
+            var parsedContent = StringContentToStringWithLineBreaks(content);
 
-            var codeBlock = ViewSupplier.GetIndentedCodeBlock(parsedContent);
-            StoreView(codeBlock);
+            var blockView = ViewSupplier.GetIndentedCodeBlock(parsedContent);
+            StoreView(blockView);
+        }
+        
+        public void StartAndFinalizeHtmlBlock(StringContent content)
+        {
+            var parsedContent = StringContentToStringWithLineBreaks(content);
+
+            var blockView = ViewSupplier.GetHtmlBlock(parsedContent);
+            StoreView(blockView);
         }
 
         public void StartAndFinalizeThematicBreak()
@@ -253,7 +260,7 @@ namespace MarkdownParser
             }
         }
         
-        private string ParseStringContentToString(StringContent content)
+        private string StringContentToStringWithLineBreaks(StringContent content)
         {
             var stringWriter = new StringWriter();
             content.WriteTo(stringWriter);

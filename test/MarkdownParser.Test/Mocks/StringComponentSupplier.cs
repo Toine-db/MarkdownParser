@@ -62,6 +62,11 @@ internal class StringComponentSupplier : IViewSupplier<string>
         return $"indentedview>|{content}|<indentedview";
     }
 
+    public string GetHtmlBlock(string content)
+    {
+        return $"htmlview>|{content}|<htmlview";
+    }
+
     public string GetTextualLineBreak()
     {
         return Environment.NewLine;
