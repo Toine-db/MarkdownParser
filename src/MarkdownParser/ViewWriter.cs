@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using CommonMark.Syntax;
 
@@ -10,8 +10,14 @@ namespace MarkdownParser
     {
         private IViewSupplier<T> ViewSupplier { get; }
         private List<T> WrittenViews { get; set; } = new List<T>();
-
         private Stack<ViewWriterCache<T>> Workbench { get; } = new Stack<ViewWriterCache<T>>();
+        private Dictionary<string, Reference> _referenceDefinitions;
+
+        public ViewWriter(IViewSupplier<T> viewSupplier)
+        {
+            ViewSupplier = viewSupplier;
+        }
+
         private ViewWriterCache<T> GetWorkbenchItem()
         {
             if (Workbench.Count == 0)
@@ -22,17 +28,17 @@ namespace MarkdownParser
             return Workbench.Peek();
         }
 
-        public ViewWriter(IViewSupplier<T> viewSupplier)
-        {
-            ViewSupplier = viewSupplier;
-        }
-
         public List<T> Flush()
         {
             var collectedViews = WrittenViews;
             WrittenViews = new List<T>();
 
             return collectedViews;
+        }
+
+        public void RegisterReferenceDefinitions(Dictionary<string, Reference> referenceDefinitions)
+        {
+            _referenceDefinitions = referenceDefinitions;
         }
 
         public void StartBlock(BlockTag blockType, string content = "")
@@ -57,8 +63,9 @@ namespace MarkdownParser
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) ?
-                                ViewSupplier.GetTextView(itemsCacheTuple.Item1) : itemsCacheTuple.Item2;
+                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) 
+                    ? ViewSupplier.GetTextView(itemsCacheTuple.Item1) 
+                    : itemsCacheTuple.Item2;
 
                 if (view != null)
                 {
@@ -94,7 +101,6 @@ namespace MarkdownParser
             var wbi = GetWorkbenchItem();
             if (wbi.ComponentType != BlockTag.AtxHeading
                 && wbi.ComponentType != BlockTag.SetextHeading)
-
             {
                 Debug.WriteLine($"Finalizing Header can not finalize {wbi.ComponentType}");
                 return;
@@ -107,8 +113,9 @@ namespace MarkdownParser
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) ?
-                                ViewSupplier.GetHeaderView(itemsCacheTuple.Item1, headerLevel) : itemsCacheTuple.Item2;
+                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) 
+                    ? ViewSupplier.GetHeaderView(itemsCacheTuple.Item1, headerLevel) 
+                    : itemsCacheTuple.Item2;
 
                 views.Add(view);
             }
@@ -155,8 +162,9 @@ namespace MarkdownParser
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) ?
-                                ViewSupplier.GetTextView(itemsCacheTuple.Item1) : itemsCacheTuple.Item2;
+                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) 
+                    ? ViewSupplier.GetTextView(itemsCacheTuple.Item1) 
+                    : itemsCacheTuple.Item2;
 
                 if (view != null)
                 {
@@ -164,9 +172,9 @@ namespace MarkdownParser
                 }
             }
 
-            var flattendView = StackViews(views);
+            var flattenedView = StackViews(views);
 
-            var listItemView = ViewSupplier.GetListItemView(flattendView, isOrderedList, sequenceNumber, depthLevel);
+            var listItemView = ViewSupplier.GetListItemView(flattenedView, isOrderedList, sequenceNumber, depthLevel);
 
             StoreView(listItemView);
         }
@@ -182,10 +190,62 @@ namespace MarkdownParser
             StoreView(imageView);
         }
 
+        public void StartAndFinalizeFencedCodeBlock(StringContent content, string blockInfo)
+        {
+            var parsedContent = StringContentToStringWithLineBreaks(content);
+
+            var blockView = ViewSupplier.GetFencedCodeBlock(parsedContent, blockInfo);
+            StoreView(blockView);
+        }
+
+        public void StartAndFinalizeIndentedCodeBlock(StringContent content)
+        {
+            var parsedContent = StringContentToStringWithLineBreaks(content);
+
+            var blockView = ViewSupplier.GetIndentedCodeBlock(parsedContent);
+            StoreView(blockView);
+        }
+        
+        public void StartAndFinalizeHtmlBlock(StringContent content)
+        {
+            var parsedContent = StringContentToStringWithLineBreaks(content);
+
+            var blockView = ViewSupplier.GetHtmlBlock(parsedContent);
+            StoreView(blockView);
+        }
+
+        public void StartAndFinalizeReferenceDefinitions()
+        {
+            if (_referenceDefinitions == null || _referenceDefinitions.Count == 0)
+            {
+                return;
+            }
+
+            var markdownReferenceDefinition = new List<MarkdownReferenceDefinition>();
+            foreach (var referenceDefinition in _referenceDefinitions)
+            {
+                if (referenceDefinition.Value == null)
+                {
+                    continue;
+                }
+
+                markdownReferenceDefinition.Add(new MarkdownReferenceDefinition()
+                {
+                    IsPlaceholder = referenceDefinition.Value.IsPlaceholder,
+                    Label = referenceDefinition.Value.Label,
+                    Title = referenceDefinition.Value.Title,
+                    Url = referenceDefinition.Value.Url
+                });
+            }
+
+            var view = ViewSupplier.GetReferenceDefinitions(markdownReferenceDefinition);
+            StoreView(view);
+        }
+
         public void StartAndFinalizeThematicBreak()
         {
-            var seperator = ViewSupplier.GetThematicBreak();
-            StoreView(seperator);
+            var separator = ViewSupplier.GetThematicBreak();
+            StoreView(separator);
         }
 
         public void StartAndFinalizePlaceholderBlock(string placeholderName)
@@ -194,16 +254,23 @@ namespace MarkdownParser
             StoreView(placeholderView);
         }
 
+        public string GetTextualLineBreak()
+        {
+            return ViewSupplier.GetTextualLineBreak();
+        }
+
         private T StackViews(List<T> views)
         {
-            if (views == null || views.Count == 0)
+            if (views == null 
+                || views.Count == 0)
             {
                 return default(T);
             }
 
             // multiple views combine a single stack layout
-            var viewToStore = views.Count == 1 ?
-                views[0] : ViewSupplier.GetStackLayoutView(views);
+            var viewToStore = views.Count == 1 
+                ? views[0] 
+                : ViewSupplier.GetStackLayoutView(views);
 
             return viewToStore;
         }
@@ -226,6 +293,18 @@ namespace MarkdownParser
                 WrittenViews.Add(view);
             }
         }
+        
+        private string StringContentToStringWithLineBreaks(StringContent content)
+        {
+            var stringWriter = new StringWriter();
+            content.WriteTo(stringWriter);
+            var contentLines = stringWriter.ToString();
 
+            contentLines = contentLines.Replace("\r", "");
+            contentLines = contentLines.TrimEnd('\n');
+            contentLines = contentLines.Replace("\n", GetTextualLineBreak());
+
+            return contentLines;
+        }
     }
 }

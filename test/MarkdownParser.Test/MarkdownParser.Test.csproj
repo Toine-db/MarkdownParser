@@ -13,20 +13,26 @@
     <None Remove="Resources\Examples\Combined\basic-example.md" />
     <None Remove="Resources\Examples\Combined\full-example.md" />
     <None Remove="Resources\Examples\Combined\minimal-example.md" />
+    <None Remove="Resources\Examples\Sections\codeblocks.md" />
     <None Remove="Resources\Examples\Sections\headers.md" />
+    <None Remove="Resources\Examples\Sections\htmlblocks.md" />
     <None Remove="Resources\Examples\Sections\list.md" />
     <None Remove="Resources\Examples\Sections\nestedlist.md" />
     <None Remove="Resources\Examples\Sections\paragraphs.md" />
+    <None Remove="Resources\Examples\Sections\referencedefinitions.md" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Examples\Combined\basic-example.md" />
     <EmbeddedResource Include="Resources\Examples\Combined\full-example.md" />
     <EmbeddedResource Include="Resources\Examples\Combined\minimal-example.md" />
+    <EmbeddedResource Include="Resources\Examples\Sections\codeblocks.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\headers.md" />
+    <EmbeddedResource Include="Resources\Examples\Sections\htmlblocks.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\list.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\nestedlist.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\paragraphs.md" />
+    <EmbeddedResource Include="Resources\Examples\Sections\referencedefinitions.md" />
   </ItemGroup>
 
   <ItemGroup>
