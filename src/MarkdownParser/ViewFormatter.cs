@@ -17,12 +17,15 @@ namespace MarkdownParser
         public List<T> Format(Block markdownBlock)
         {
             WriteBlockToView(markdownBlock, _writer);
+            _writer.StartAndFinalizeReferenceDefinitions();
+
             return _writer.Flush();
         }
 
         public List<T> FormatSingleBlock(Block markdownBlock)
         {
             WriteBlockToView(markdownBlock, _writer, false);
+
             return _writer.Flush();
         }
 
@@ -36,6 +39,7 @@ namespace MarkdownParser
             switch (block.Tag)
             {
                 case BlockTag.Document:
+                    _writer.RegisterReferenceDefinitions(block.Document.ReferenceMap);
                     WriteBlockToView(block.FirstChild, writer);
                     break;
                 case BlockTag.Paragraph:
@@ -78,8 +82,7 @@ namespace MarkdownParser
                     writer.StartAndFinalizeHtmlBlock(block.StringContent);
                     break;
                 case BlockTag.ReferenceDefinition:
-                    // TODO
-                    var currentBlock4 = block;
+                    // ignore, handled at the end of document by _writer.StartAndFinalizeReferenceDefinitions()
                     break;
                 default:
                     throw new CommonMarkException("Block type " + block.Tag + " is not supported.", block);

@@ -67,6 +67,22 @@ internal class StringComponentSupplier : IViewSupplier<string>
         return $"htmlview>|{content}|<htmlview";
     }
 
+    public string GetReferenceDefinitions(IEnumerable<MarkdownReferenceDefinition> markdownReferenceDefinitions)
+    {
+        var content = "referencedefinitions>";
+        foreach (var markdownReferenceDefinition in markdownReferenceDefinitions)
+        {
+            content += $"|{markdownReferenceDefinition.IsPlaceholder}";
+            content += $"*{markdownReferenceDefinition.Label}";
+            content += $"*{markdownReferenceDefinition.Title}";
+            content += $"*{markdownReferenceDefinition.Url}";
+        }
+
+        content += "|<referencedefinitions";
+
+        return content;
+    }
+
     public string GetTextualLineBreak()
     {
         return Environment.NewLine;

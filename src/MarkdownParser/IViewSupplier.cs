@@ -96,5 +96,12 @@ namespace MarkdownParser
         /// </summary>
         /// <returns></returns>
         T GetHtmlBlock(string content);
+
+        /// <summary>
+        /// a view that shows reference definitions ([link]s usually at the end of the document)
+        /// </summary>
+        /// <param name="markdownReferenceDefinitions">collection of Reference Definitions</param>
+        /// <returns></returns>
+        T GetReferenceDefinitions(IEnumerable<MarkdownReferenceDefinition> markdownReferenceDefinitions);
     }
 }

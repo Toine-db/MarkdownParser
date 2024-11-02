@@ -11,6 +11,7 @@ namespace MarkdownParser
         private IViewSupplier<T> ViewSupplier { get; }
         private List<T> WrittenViews { get; set; } = new List<T>();
         private Stack<ViewWriterCache<T>> Workbench { get; } = new Stack<ViewWriterCache<T>>();
+        private Dictionary<string, Reference> _referenceDefinitions;
 
         public ViewWriter(IViewSupplier<T> viewSupplier)
         {
@@ -33,6 +34,11 @@ namespace MarkdownParser
             WrittenViews = new List<T>();
 
             return collectedViews;
+        }
+
+        public void RegisterReferenceDefinitions(Dictionary<string, Reference> referenceDefinitions)
+        {
+            _referenceDefinitions = referenceDefinitions;
         }
 
         public void StartBlock(BlockTag blockType, string content = "")
@@ -206,6 +212,34 @@ namespace MarkdownParser
 
             var blockView = ViewSupplier.GetHtmlBlock(parsedContent);
             StoreView(blockView);
+        }
+
+        public void StartAndFinalizeReferenceDefinitions()
+        {
+            if (_referenceDefinitions == null || _referenceDefinitions.Count == 0)
+            {
+                return;
+            }
+
+            var markdownReferenceDefinition = new List<MarkdownReferenceDefinition>();
+            foreach (var referenceDefinition in _referenceDefinitions)
+            {
+                if (referenceDefinition.Value == null)
+                {
+                    continue;
+                }
+
+                markdownReferenceDefinition.Add(new MarkdownReferenceDefinition()
+                {
+                    IsPlaceholder = referenceDefinition.Value.IsPlaceholder,
+                    Label = referenceDefinition.Value.Label,
+                    Title = referenceDefinition.Value.Title,
+                    Url = referenceDefinition.Value.Url
+                });
+            }
+
+            var view = ViewSupplier.GetReferenceDefinitions(markdownReferenceDefinition);
+            StoreView(view);
         }
 
         public void StartAndFinalizeThematicBreak()

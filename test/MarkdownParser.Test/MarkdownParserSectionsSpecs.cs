@@ -186,4 +186,44 @@ public class MarkdownParserSectionsSpecs
         secondHtmlViewContentGroup[6].Trim().Should().Be("<p>Lorem Ipsum...</p>");
         secondHtmlViewContentGroup[7].Trim().Should().Be("</article>");
     }
+
+    [TestMethod]
+    public void When_parsing_reference_definitions_it_should_output_specific_views()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var markdown = FileReader.ReadFile("Sections.referencedefinitions.md");
+
+        var mockComponentSupplier = new StringComponentSupplier();
+        var parser = new MarkdownParser<string>(mockComponentSupplier);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var parseResult = parser.Parse(markdown);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        parseResult.Count.Should().Be(2);
+        parseResult[0].Should().StartWith("stackview>:+textview");
+
+        var referenceDefinitionsViewGroup = parseResult[1].Split('|');
+        referenceDefinitionsViewGroup.Length.Should().Be(4);
+        referenceDefinitionsViewGroup.First().Should().Be("referencedefinitions>");
+        referenceDefinitionsViewGroup.Last().Should().Be("<referencedefinitions");
+
+        var firstReferenceDefinition = referenceDefinitionsViewGroup[1].Split("*");
+        firstReferenceDefinition[0].Trim().Should().Be("False");
+        firstReferenceDefinition[1].Trim().Should().Be("LINK");
+        firstReferenceDefinition[2].Trim().Should().Be("title");
+        firstReferenceDefinition[3].Trim().Should().Be("/uri");
+
+        var secondReferenceDefinition = referenceDefinitionsViewGroup[2].Split("*");
+        secondReferenceDefinition[0].Trim().Should().Be("False");
+        secondReferenceDefinition[1].Trim().Should().Be("PORTTITOR NON QUAM");
+        secondReferenceDefinition[2].Trim().Should().Be("");
+        secondReferenceDefinition[3].Trim().Should().Be("https://lipsum.com/");
+    }
 }
