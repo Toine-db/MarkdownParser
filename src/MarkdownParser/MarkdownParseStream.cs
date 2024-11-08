@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CommonMark.Syntax;
+using MarkdownParser.Writer;
 
 namespace MarkdownParser
 {

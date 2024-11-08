@@ -2,6 +2,7 @@
 using System.IO;
 using CommonMark;
 using CommonMark.Syntax;
+using MarkdownParser.Writer;
 
 namespace MarkdownParser
 {
@@ -14,6 +15,11 @@ namespace MarkdownParser
             _viewSupplier = viewSupplier;
         }
 
+        /// <summary>
+        /// Format\Convert markdown into UI Components
+        /// </summary>
+        /// <param name="markdownSource"></param>
+        /// <returns></returns>
         public List<T> Parse(string markdownSource)
         {
             using (var reader = new StringReader(markdownSource))
@@ -22,6 +28,11 @@ namespace MarkdownParser
             }
         }
 
+        /// <summary>
+        /// Format\Convert markdown into UI Components
+        /// </summary>
+        /// <param name="markdownSource"></param>
+        /// <returns></returns>
         public List<T> Parse(TextReader markdownSource)
         {
             // Parse to usable c# objects
@@ -34,11 +45,18 @@ namespace MarkdownParser
             return uiComponents;
         }
 
-        public static Block GetMarkdownDocument(TextReader markdownSource)
+        /// <summary>
+        /// Get usable c# objects from 
+        /// </summary>s
+        /// <param name="markdownSource"></param>
+        /// <returns></returns>
+        internal static Block GetMarkdownDocument(TextReader markdownSource)
         {
             // Parse to usable c# objects
             var settings = CommonMarkSettings.Default.Clone();
             settings.AdditionalFeatures |= CommonMarkAdditionalFeatures.PlaceholderBracket;
+            settings.AdditionalFeatures |= CommonMarkAdditionalFeatures.StrikethroughTilde;
+            
             return CommonMarkConverter.Parse(markdownSource, settings);
         }
     }

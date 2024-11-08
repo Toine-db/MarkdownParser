@@ -20,6 +20,8 @@
     <None Remove="Resources\Examples\Sections\nestedlist.md" />
     <None Remove="Resources\Examples\Sections\paragraphs.md" />
     <None Remove="Resources\Examples\Sections\referencedefinitions.md" />
+    <None Remove="Resources\Examples\TextEmphasis\basic-links.md" />
+    <None Remove="Resources\Examples\TextEmphasis\basic-text.md" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +35,8 @@
     <EmbeddedResource Include="Resources\Examples\Sections\nestedlist.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\paragraphs.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\referencedefinitions.md" />
+    <EmbeddedResource Include="Resources\Examples\TextEmphasis\basic-links.md" />
+    <EmbeddedResource Include="Resources\Examples\TextEmphasis\basic-text.md" />
   </ItemGroup>
 
   <ItemGroup>

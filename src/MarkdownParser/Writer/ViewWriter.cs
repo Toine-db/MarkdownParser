@@ -3,8 +3,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CommonMark.Syntax;
+using MarkdownParser.Models;
+using MarkdownParser.Models.Segments;
 
-namespace MarkdownParser
+namespace MarkdownParser.Writer
 {
     public class ViewWriter<T>
     {
@@ -39,12 +41,35 @@ namespace MarkdownParser
         public void RegisterReferenceDefinitions(Dictionary<string, Reference> referenceDefinitions)
         {
             _referenceDefinitions = referenceDefinitions;
+
+            if (_referenceDefinitions == null || _referenceDefinitions.Count == 0)
+            {
+                return;
+            }
+
+            var markdownReferenceDefinition = new List<MarkdownReferenceDefinition>();
+            foreach (var referenceDefinition in _referenceDefinitions)
+            {
+                if (referenceDefinition.Value == null)
+                {
+                    continue;
+                }
+
+                markdownReferenceDefinition.Add(new MarkdownReferenceDefinition()
+                {
+                    IsPlaceholder = referenceDefinition.Value.IsPlaceholder,
+                    Label = referenceDefinition.Value.Label,
+                    Title = referenceDefinition.Value.Title,
+                    Url = referenceDefinition.Value.Url
+                });
+            }
+
+            ViewSupplier.RegisterReferenceDefinitions(markdownReferenceDefinition);
         }
 
-        public void StartBlock(BlockTag blockType, string content = "")
+        public void StartBlock(BlockTag blockType)
         {
             Workbench.Push(new ViewWriterCache<T> { ComponentType = blockType });
-            GetWorkbenchItem().Add(content);
         }
 
         public void FinalizeParagraphBlock()
@@ -59,17 +84,17 @@ namespace MarkdownParser
             var views = new List<T>();
 
             var topWorkbenchItem = Workbench.Pop();
-            var itemsCache = topWorkbenchItem.GetGroupedCachedValues();
+            var itemsCache = topWorkbenchItem.FlushCache();
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) 
-                    ? ViewSupplier.GetTextView(itemsCacheTuple.Item1) 
-                    : itemsCacheTuple.Item2;
+                var view = itemsCacheTuple.TextBlock != null
+                    ? ViewSupplier.GetTextView(itemsCacheTuple.TextBlock)
+                    : itemsCacheTuple.Value;
 
                 if (view != null)
                 {
-	                views.Add(view);
+                    views.Add(view);
                 }
             }
 
@@ -86,7 +111,7 @@ namespace MarkdownParser
             }
 
             var topWorkbenchItem = Workbench.Pop();
-            var itemsCache = topWorkbenchItem.GetGroupedCachedValues();
+            var itemsCache = topWorkbenchItem.FlushCache();
 
             var childViews = itemsCache.Select(itemsCacheTuple => itemsCacheTuple.Item2).ToList();
             var childView = StackViews(childViews);
@@ -109,13 +134,13 @@ namespace MarkdownParser
             var views = new List<T>();
 
             var topWorkbenchItem = Workbench.Pop();
-            var itemsCache = topWorkbenchItem.GetGroupedCachedValues();
+            var itemsCache = topWorkbenchItem.FlushCache();
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) 
-                    ? ViewSupplier.GetHeaderView(itemsCacheTuple.Item1, headerLevel) 
-                    : itemsCacheTuple.Item2;
+                var view = itemsCacheTuple.TextBlock != null
+                    ? ViewSupplier.GetHeaderView(itemsCacheTuple.TextBlock, headerLevel)
+                    : itemsCacheTuple.Value;
 
                 views.Add(view);
             }
@@ -133,7 +158,7 @@ namespace MarkdownParser
             }
 
             var topWorkbenchItem = Workbench.Pop();
-            var itemsCache = topWorkbenchItem.GetGroupedCachedValues();
+            var itemsCache = topWorkbenchItem.FlushCache();
 
             var listItems = itemsCache.Select(itemsCacheTuple => itemsCacheTuple.Item2).ToList();
             var listView = ViewSupplier.GetListView(listItems);
@@ -157,18 +182,17 @@ namespace MarkdownParser
             var depthLevel = Workbench.Count(wbItem => wbItem.ComponentType == BlockTag.List);
 
             var topWorkbenchItem = Workbench.Pop();
-            var itemsCache = topWorkbenchItem.GetGroupedCachedValues();
-
+            var itemsCache = topWorkbenchItem.FlushCache();
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = !string.IsNullOrEmpty(itemsCacheTuple.Item1) 
-                    ? ViewSupplier.GetTextView(itemsCacheTuple.Item1) 
-                    : itemsCacheTuple.Item2;
+                var view = itemsCacheTuple.TextBlock != null
+                    ? ViewSupplier.GetTextView(itemsCacheTuple.TextBlock)
+                    : itemsCacheTuple.Value;
 
                 if (view != null)
                 {
-	                views.Add(view);
+                    views.Add(view);
                 }
             }
 
@@ -179,9 +203,48 @@ namespace MarkdownParser
             StoreView(listItemView);
         }
 
-        public void AddText(string content)
+        public void AddText(string content, int firstCharacterPosition)
         {
-            GetWorkbenchItem().Add(content);
+            GetWorkbenchItem().Add(content, firstCharacterPosition);
+        }
+
+        public void AddLink(Inline inline, int firstCharacterPosition, int length, string url, string urlTitle)
+        {
+            GetWorkbenchItem().AddLink(firstCharacterPosition, length, url, urlTitle);
+        }
+
+        public void AddEmphasis(Inline inline, int firstCharacterPosition, int length)
+        {
+            SegmentIndicator indicator;
+            switch (inline.Tag)
+            {
+                case InlineTag.Strikethrough:
+                    indicator = SegmentIndicator.Strikethrough;
+                    break;
+                case InlineTag.Strong:
+                    indicator = SegmentIndicator.Strong;
+                    break;
+                case InlineTag.Code:
+                    indicator = SegmentIndicator.Code;
+                    break;
+                case InlineTag.Emphasis:
+                    indicator = SegmentIndicator.Italic;
+                    break;
+                case InlineTag.LineBreak:
+                case InlineTag.SoftBreak:
+                    indicator = SegmentIndicator.LineBreak;
+                    break;
+                default:
+                    indicator = SegmentIndicator.NotSupported;
+                    break;
+            }
+
+            if (indicator == SegmentIndicator.NotSupported)
+            {
+                return;
+            }
+
+            GetWorkbenchItem().Add(indicator, firstCharacterPosition, length);
         }
 
         public void StartAndFinalizeImageBlock(string targetUrl, string subscription, string imageId)
@@ -192,54 +255,26 @@ namespace MarkdownParser
 
         public void StartAndFinalizeFencedCodeBlock(StringContent content, string blockInfo)
         {
-            var parsedContent = StringContentToStringWithLineBreaks(content);
+            var blocks = StringContentToBlocks(content);
 
-            var blockView = ViewSupplier.GetFencedCodeBlock(parsedContent, blockInfo);
+            var blockView = ViewSupplier.GetFencedCodeBlock(blocks, blockInfo);
             StoreView(blockView);
         }
 
         public void StartAndFinalizeIndentedCodeBlock(StringContent content)
         {
-            var parsedContent = StringContentToStringWithLineBreaks(content);
+            var blocks = StringContentToBlocks(content);
 
-            var blockView = ViewSupplier.GetIndentedCodeBlock(parsedContent);
+            var blockView = ViewSupplier.GetIndentedCodeBlock(blocks);
             StoreView(blockView);
         }
-        
+
         public void StartAndFinalizeHtmlBlock(StringContent content)
         {
-            var parsedContent = StringContentToStringWithLineBreaks(content);
+            var blocks = StringContentToBlocks(content);
 
-            var blockView = ViewSupplier.GetHtmlBlock(parsedContent);
+            var blockView = ViewSupplier.GetHtmlBlock(blocks);
             StoreView(blockView);
-        }
-
-        public void StartAndFinalizeReferenceDefinitions()
-        {
-            if (_referenceDefinitions == null || _referenceDefinitions.Count == 0)
-            {
-                return;
-            }
-
-            var markdownReferenceDefinition = new List<MarkdownReferenceDefinition>();
-            foreach (var referenceDefinition in _referenceDefinitions)
-            {
-                if (referenceDefinition.Value == null)
-                {
-                    continue;
-                }
-
-                markdownReferenceDefinition.Add(new MarkdownReferenceDefinition()
-                {
-                    IsPlaceholder = referenceDefinition.Value.IsPlaceholder,
-                    Label = referenceDefinition.Value.Label,
-                    Title = referenceDefinition.Value.Title,
-                    Url = referenceDefinition.Value.Url
-                });
-            }
-
-            var view = ViewSupplier.GetReferenceDefinitions(markdownReferenceDefinition);
-            StoreView(view);
         }
 
         public void StartAndFinalizeThematicBreak()
@@ -254,22 +289,17 @@ namespace MarkdownParser
             StoreView(placeholderView);
         }
 
-        public string GetTextualLineBreak()
-        {
-            return ViewSupplier.GetTextualLineBreak();
-        }
-
         private T StackViews(List<T> views)
         {
-            if (views == null 
+            if (views == null
                 || views.Count == 0)
             {
-                return default(T);
+                return default;
             }
 
             // multiple views combine a single stack layout
-            var viewToStore = views.Count == 1 
-                ? views[0] 
+            var viewToStore = views.Count == 1
+                ? views[0]
                 : ViewSupplier.GetStackLayoutView(views);
 
             return viewToStore;
@@ -282,7 +312,7 @@ namespace MarkdownParser
                 return;
             }
 
-            // Check if Workbench has an item where its working on
+            // Check if Workbench has an item where it's working on
             var wbi = GetWorkbenchItem();
             if (wbi != null)  // add the new View to the WorkbenchItem
             {
@@ -293,8 +323,8 @@ namespace MarkdownParser
                 WrittenViews.Add(view);
             }
         }
-        
-        private string StringContentToStringWithLineBreaks(StringContent content)
+
+        private TextBlock StringContentToBlocks(StringContent content)
         {
             var stringWriter = new StringWriter();
             content.WriteTo(stringWriter);
@@ -302,9 +332,26 @@ namespace MarkdownParser
 
             contentLines = contentLines.Replace("\r", "");
             contentLines = contentLines.TrimEnd('\n');
-            contentLines = contentLines.Replace("\n", GetTextualLineBreak());
 
-            return contentLines;
+            var contentParts = contentLines.Split('\n');
+            var segments = new List<BaseSegment>();
+            if (contentParts.Any())
+            {
+                segments.Add(new Segment(contentParts.First()));
+
+                for (var i = 1; i < contentParts.Length; i++)
+                {
+                    var lineBreakSegment = new IndicatorSegment(SegmentIndicator.LineBreak, SegmentIndicatorPosition.Start);
+                    segments.Add(lineBreakSegment);
+
+                    var textSegment = new Segment(contentParts[i]);
+                    segments.Add(textSegment);
+                }
+            }
+
+            var textBlock = new TextBlock(segments.ToArray());
+
+            return textBlock;
         }
     }
 }

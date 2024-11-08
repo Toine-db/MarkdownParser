@@ -1,4 +1,4 @@
-﻿namespace MarkdownParser
+﻿namespace MarkdownParser.Models
 {
     public class MarkdownReferenceDefinition
     {

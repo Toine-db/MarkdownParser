@@ -1,9 +1,19 @@
-﻿namespace MarkdownParser.Test.Mocks;
+﻿using MarkdownParser.Models;
+
+namespace MarkdownParser.Test.Mocks;
 
 internal class StringComponentSupplier : IViewSupplier<string>
 {
-    public string GetTextView(string content)
+    public MarkdownReferenceDefinition[]? MarkdownReferenceDefinitions { get; private set; }
+
+    public void RegisterReferenceDefinitions(IEnumerable<MarkdownReferenceDefinition> markdownReferenceDefinitions)
     {
+        MarkdownReferenceDefinitions = markdownReferenceDefinitions.ToArray();
+    }
+
+    public string GetTextView(TextBlock textBlock)
+    {
+        var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"textview:{content}";
     }
 
@@ -12,8 +22,9 @@ internal class StringComponentSupplier : IViewSupplier<string>
         return $"blockquoteview>:{content}<blockquoteview";
     }
 
-    public string GetHeaderView(string content, int headerLevel)
+    public string GetHeaderView(TextBlock textBlock, int headerLevel)
     {
+        var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"headerview:{headerLevel}:{content}";
     }
 
@@ -52,25 +63,28 @@ internal class StringComponentSupplier : IViewSupplier<string>
         return $"placeholderview:{placeholderName}";
     }
 
-    public string GetFencedCodeBlock(string content, string codeInfo)
+    public string GetFencedCodeBlock(TextBlock textBlock, string codeInfo)
     {
+        var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"fencedcodeview>|({codeInfo})|{content}|<fencedcodeview";
     }
 
-    public string GetIndentedCodeBlock(string content)
+    public string GetIndentedCodeBlock(TextBlock textBlock)
     {
+        var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"indentedview>|{content}|<indentedview";
     }
 
-    public string GetHtmlBlock(string content)
+    public string GetHtmlBlock(TextBlock textBlock)
     {
+        var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"htmlview>|{content}|<htmlview";
     }
 
-    public string GetReferenceDefinitions(IEnumerable<MarkdownReferenceDefinition> markdownReferenceDefinitions)
+    public string GetReferenceDefinitions()
     {
         var content = "referencedefinitions>";
-        foreach (var markdownReferenceDefinition in markdownReferenceDefinitions)
+        foreach (var markdownReferenceDefinition in MarkdownReferenceDefinitions)
         {
             content += $"|{markdownReferenceDefinition.IsPlaceholder}";
             content += $"*{markdownReferenceDefinition.Label}";
@@ -81,10 +95,5 @@ internal class StringComponentSupplier : IViewSupplier<string>
         content += "|<referencedefinitions";
 
         return content;
-    }
-
-    public string GetTextualLineBreak()
-    {
-        return Environment.NewLine;
     }
 }

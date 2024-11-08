@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using CommonMark;
 using CommonMark.Syntax;
 
-namespace MarkdownParser
+namespace MarkdownParser.Writer
 {
     public class ViewFormatter<T>
     {
@@ -17,7 +17,6 @@ namespace MarkdownParser
         public List<T> Format(Block markdownBlock)
         {
             WriteBlockToView(markdownBlock, _writer);
-            _writer.StartAndFinalizeReferenceDefinitions();
 
             return _writer.Flush();
         }
@@ -82,7 +81,7 @@ namespace MarkdownParser
                     writer.StartAndFinalizeHtmlBlock(block.StringContent);
                     break;
                 case BlockTag.ReferenceDefinition:
-                    // ignore, handled at the end of document by _writer.StartAndFinalizeReferenceDefinitions()
+                    // ignore this tag, because it's handled before so the data can be used during the formatting
                     break;
                 default:
                     throw new CommonMarkException("Block type " + block.Tag + " is not supported.", block);
@@ -103,13 +102,16 @@ namespace MarkdownParser
 
             switch (inline.Tag)
             {
-                case InlineTag.String:
                 case InlineTag.Code:
+                    writer.AddEmphasis(inline, inline.SourcePosition, inline.SourceLength);
+                    writer.AddText(inline.LiteralContent, inline.SourcePosition);
+                    break;
+                case InlineTag.String:
                 case InlineTag.RawHtml:
-                    writer.AddText(inline.LiteralContent);
+                    writer.AddText(inline.LiteralContent, inline.SourcePosition);
                     break;
                 case InlineTag.Link:
-                    // TODO; maybe
+                    writer.AddLink(inline, inline.SourcePosition, inline.SourceLength, inline.TargetUrl, inline.LiteralContent); // check if this works at links
                     WriteInlineToView(inline.FirstChild, writer);
                     break;
                 case InlineTag.Image:
@@ -117,7 +119,7 @@ namespace MarkdownParser
                     break;
                 case InlineTag.SoftBreak:
                 case InlineTag.LineBreak:
-                    writer.AddText(writer.GetTextualLineBreak());
+                    writer.AddEmphasis(inline, inline.SourcePosition, inline.SourceLength);
                     break;
                 case InlineTag.Placeholder:
                     writer.StartAndFinalizePlaceholderBlock(inline.TargetUrl);
@@ -125,9 +127,9 @@ namespace MarkdownParser
                 case InlineTag.Strikethrough:
                 case InlineTag.Emphasis:
                 case InlineTag.Strong:
+                    writer.AddEmphasis(inline, inline.SourcePosition, inline.SourceLength);
                     WriteInlineToView(inline.FirstChild, writer);
                     break;
-
                 default:
                     throw new ArgumentOutOfRangeException();
             }
