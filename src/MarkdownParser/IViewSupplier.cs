@@ -44,7 +44,7 @@ namespace MarkdownParser
         T GetImageView(string url, string subscription, string imageId);
 
         /// <summary>
-        /// a view that shows a list of listitems 
+        /// a view that shows a list of list-items 
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
@@ -53,7 +53,7 @@ namespace MarkdownParser
         /// <summary>
         /// a view that shows a single item for a ListView (return View can be used in GetListView)
         /// </summary>
-        /// <param name="childView">view as childview (or use the content parameter)</param>
+        /// <param name="childView">view as child-view (or use the content parameter)</param>
         /// <param name="isOrderedList">does the item belong to a ordered (numbered) list</param>
         /// <param name="sequenceNumber">number of sequence</param>
         /// <param name="listLevel">level depth of the list, root level starting at 1</param>

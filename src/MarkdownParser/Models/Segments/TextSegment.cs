@@ -1,10 +1,10 @@
 ﻿namespace MarkdownParser.Models.Segments
 {
-    public sealed class Segment : BaseSegment
+    public class TextSegment : BaseSegment
     {
         public string Text { get; set; }
 
-        public Segment(string text)
+        public TextSegment(string text)
         {
             Text = text;
             HasLiteralContent = !string.IsNullOrWhiteSpace(Text);

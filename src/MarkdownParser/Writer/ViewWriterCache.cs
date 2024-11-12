@@ -3,6 +3,7 @@ using System.Linq;
 using CommonMark.Syntax;
 using MarkdownParser.Models;
 using MarkdownParser.Models.Segments;
+using MarkdownParser.Models.Segments.Indicators;
 
 namespace MarkdownParser.Writer
 {
@@ -14,7 +15,7 @@ namespace MarkdownParser.Writer
         private readonly Stack<(BaseSegment Segment, T Value)> _valuesStack = new Stack<(BaseSegment, T)>();
 
         // SegmentIndicators that are not ended/closed yet
-        private readonly List<(Models.Segments.SegmentIndicator SegmentIndicator, int lastCharacterPosition)> _pendingSegmentIndicators = new List<(SegmentIndicator SegmentIndicator, int lastCharacterPosition)>();
+        private readonly List<(SegmentIndicator SegmentIndicator, int lastCharacterPosition)> _pendingSegmentIndicators = new List<(SegmentIndicator SegmentIndicator, int lastCharacterPosition)>();
 
         private readonly T _defaultT = default;
 
@@ -37,7 +38,7 @@ namespace MarkdownParser.Writer
                 return;
             }
 
-            var segment = new Segment(item);
+            var segment = new TextSegment(item);
             _valuesStack.Push((segment, _defaultT));
         }
 
@@ -124,7 +125,17 @@ namespace MarkdownParser.Writer
                 {
                     _pendingSegmentIndicators.Remove(pendingIndicator);
 
-                    var segmentIndicator = new IndicatorSegment(pendingIndicator.SegmentIndicator, SegmentIndicatorPosition.End);
+                    IndicatorSegment segmentIndicator;
+                    switch (pendingIndicator.SegmentIndicator)
+                    {
+                        case SegmentIndicator.Link:
+                            segmentIndicator = new LinkSegment(pendingIndicator.SegmentIndicator, SegmentIndicatorPosition.End, string.Empty, string.Empty);
+                            break;
+                        default:
+                            segmentIndicator = new IndicatorSegment(pendingIndicator.SegmentIndicator, SegmentIndicatorPosition.End);
+                            break;
+                    }
+
                     _valuesStack.Push((segmentIndicator, _defaultT));
                 }
             }

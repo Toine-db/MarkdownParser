@@ -1,4 +1,4 @@
-﻿namespace MarkdownParser.Models.Segments
+﻿namespace MarkdownParser.Models.Segments.Indicators
 {
     public enum SegmentIndicator
     {

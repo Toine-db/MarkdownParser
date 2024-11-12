@@ -5,6 +5,7 @@ using System.Linq;
 using CommonMark.Syntax;
 using MarkdownParser.Models;
 using MarkdownParser.Models.Segments;
+using MarkdownParser.Models.Segments.Indicators;
 
 namespace MarkdownParser.Writer
 {
@@ -337,14 +338,14 @@ namespace MarkdownParser.Writer
             var segments = new List<BaseSegment>();
             if (contentParts.Any())
             {
-                segments.Add(new Segment(contentParts.First()));
+                segments.Add(new TextSegment(contentParts.First()));
 
                 for (var i = 1; i < contentParts.Length; i++)
                 {
                     var lineBreakSegment = new IndicatorSegment(SegmentIndicator.LineBreak, SegmentIndicatorPosition.Start);
                     segments.Add(lineBreakSegment);
 
-                    var textSegment = new Segment(contentParts[i]);
+                    var textSegment = new TextSegment(contentParts[i]);
                     segments.Add(textSegment);
                 }
             }

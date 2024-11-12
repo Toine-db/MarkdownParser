@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 using MarkdownParser.Models.Segments;
+using MarkdownParser.Models.Segments.Indicators;
 
 namespace MarkdownParser.Models
 {

@@ -1,4 +1,6 @@
-﻿namespace MarkdownParser.Models.Segments
+﻿using MarkdownParser.Models.Segments.Indicators;
+
+namespace MarkdownParser.Models.Segments
 {
     public class LinkSegment : IndicatorSegment
     {
