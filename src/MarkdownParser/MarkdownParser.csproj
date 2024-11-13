@@ -2,8 +2,9 @@
 
 	<PropertyGroup>
 		
-		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
-		
+		<TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
 		<!-- NuGet -->
 		<Authors>Toine de Boer</Authors>
 		<Copyright>Copyright © Toine de Boer and contributors</Copyright>
@@ -46,7 +47,7 @@
 
 	<ItemGroup>
 		<None Include="..\..\nuget.png" PackagePath="icon.png" Pack="true" />
-		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 	<ItemGroup>

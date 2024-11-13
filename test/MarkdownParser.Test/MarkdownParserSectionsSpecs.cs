@@ -145,7 +145,7 @@ public class MarkdownParserSectionsSpecs
         var mockComponentSupplier = new StringComponentSupplier();
         var parser = new MarkdownParser<string>(mockComponentSupplier);
 
-        var newLineIndicator = mockComponentSupplier.GetTextualLineBreak();
+        var newLineIndicator = Settings.TextualLineBreak;
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -206,24 +206,19 @@ public class MarkdownParserSectionsSpecs
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        parseResult.Count.Should().Be(2);
+        parseResult.Count.Should().Be(1);
         parseResult[0].Should().StartWith("stackview>:+textview");
 
-        var referenceDefinitionsViewGroup = parseResult[1].Split('|');
-        referenceDefinitionsViewGroup.Length.Should().Be(4);
-        referenceDefinitionsViewGroup.First().Should().Be("referencedefinitions>");
-        referenceDefinitionsViewGroup.Last().Should().Be("<referencedefinitions");
+        mockComponentSupplier.MarkdownReferenceDefinitions.Should().HaveCount(2);
 
-        var firstReferenceDefinition = referenceDefinitionsViewGroup[1].Split("*");
-        firstReferenceDefinition[0].Trim().Should().Be("False");
-        firstReferenceDefinition[1].Trim().Should().Be("LINK");
-        firstReferenceDefinition[2].Trim().Should().Be("title");
-        firstReferenceDefinition[3].Trim().Should().Be("/uri");
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].IsPlaceholder = false;
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].Label = "LINK";
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].Title = "title";
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].Url = "/uri";
 
-        var secondReferenceDefinition = referenceDefinitionsViewGroup[2].Split("*");
-        secondReferenceDefinition[0].Trim().Should().Be("False");
-        secondReferenceDefinition[1].Trim().Should().Be("PORTTITOR NON QUAM");
-        secondReferenceDefinition[2].Trim().Should().Be("");
-        secondReferenceDefinition[3].Trim().Should().Be("https://lipsum.com/");
+        mockComponentSupplier.MarkdownReferenceDefinitions[1].IsPlaceholder = false;
+        mockComponentSupplier.MarkdownReferenceDefinitions[1].Label = "PORTTITOR NON QUAM";
+        mockComponentSupplier.MarkdownReferenceDefinitions[1].Title = "";
+        mockComponentSupplier.MarkdownReferenceDefinitions[1].Url = "https://lipsum.com/";
     }
 }
