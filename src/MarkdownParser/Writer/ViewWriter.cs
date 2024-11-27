@@ -65,7 +65,7 @@ namespace MarkdownParser.Writer
                 });
             }
 
-            ViewSupplier.RegisterReferenceDefinitions(markdownReferenceDefinition);
+            ViewSupplier.OnReferenceDefinitionsPublished(markdownReferenceDefinition);
         }
 
         public void StartBlock(BlockTag blockType)
@@ -90,7 +90,7 @@ namespace MarkdownParser.Writer
             foreach (var itemsCacheTuple in itemsCache)
             {
                 var view = itemsCacheTuple.TextBlock != null
-                    ? ViewSupplier.GetTextView(itemsCacheTuple.TextBlock)
+                    ? ViewSupplier.CreateTextView(itemsCacheTuple.TextBlock)
                     : itemsCacheTuple.Value;
 
                 if (view != null)
@@ -117,7 +117,7 @@ namespace MarkdownParser.Writer
             var childViews = itemsCache.Select(itemsCacheTuple => itemsCacheTuple.Item2).ToList();
             var childView = StackViews(childViews);
 
-            var blockView = ViewSupplier.GetBlockquotesView(childView);
+            var blockView = ViewSupplier.CreateBlockquotesView(childView);
 
             StoreView(blockView);
         }
@@ -140,7 +140,7 @@ namespace MarkdownParser.Writer
             foreach (var itemsCacheTuple in itemsCache)
             {
                 var view = itemsCacheTuple.TextBlock != null
-                    ? ViewSupplier.GetHeaderView(itemsCacheTuple.TextBlock, headerLevel)
+                    ? ViewSupplier.CreateHeaderView(itemsCacheTuple.TextBlock, headerLevel)
                     : itemsCacheTuple.Value;
 
                 views.Add(view);
@@ -162,7 +162,7 @@ namespace MarkdownParser.Writer
             var itemsCache = topWorkbenchItem.FlushCache();
 
             var listItems = itemsCache.Select(itemsCacheTuple => itemsCacheTuple.Item2).ToList();
-            var listView = ViewSupplier.GetListView(listItems);
+            var listView = ViewSupplier.CreateListView(listItems);
 
             StoreView(listView);
         }
@@ -188,7 +188,7 @@ namespace MarkdownParser.Writer
             foreach (var itemsCacheTuple in itemsCache)
             {
                 var view = itemsCacheTuple.TextBlock != null
-                    ? ViewSupplier.GetTextView(itemsCacheTuple.TextBlock)
+                    ? ViewSupplier.CreateTextView(itemsCacheTuple.TextBlock)
                     : itemsCacheTuple.Value;
 
                 if (view != null)
@@ -199,7 +199,7 @@ namespace MarkdownParser.Writer
 
             var flattenedView = StackViews(views);
 
-            var listItemView = ViewSupplier.GetListItemView(flattenedView, isOrderedList, sequenceNumber, depthLevel);
+            var listItemView = ViewSupplier.CreateListItemView(flattenedView, isOrderedList, sequenceNumber, depthLevel);
 
             StoreView(listItemView);
         }
@@ -250,7 +250,7 @@ namespace MarkdownParser.Writer
 
         public void StartAndFinalizeImageBlock(string targetUrl, string subscription, string imageId)
         {
-            var imageView = ViewSupplier.GetImageView(targetUrl, subscription, imageId);
+            var imageView = ViewSupplier.CreateImageView(targetUrl, subscription, imageId);
             StoreView(imageView);
         }
 
@@ -258,7 +258,7 @@ namespace MarkdownParser.Writer
         {
             var blocks = StringContentToBlocks(content);
 
-            var blockView = ViewSupplier.GetFencedCodeBlock(blocks, blockInfo);
+            var blockView = ViewSupplier.CreateFencedCodeBlock(blocks, blockInfo);
             StoreView(blockView);
         }
 
@@ -266,7 +266,7 @@ namespace MarkdownParser.Writer
         {
             var blocks = StringContentToBlocks(content);
 
-            var blockView = ViewSupplier.GetIndentedCodeBlock(blocks);
+            var blockView = ViewSupplier.CreateIndentedCodeBlock(blocks);
             StoreView(blockView);
         }
 
@@ -274,19 +274,19 @@ namespace MarkdownParser.Writer
         {
             var blocks = StringContentToBlocks(content);
 
-            var blockView = ViewSupplier.GetHtmlBlock(blocks);
+            var blockView = ViewSupplier.CreateHtmlBlock(blocks);
             StoreView(blockView);
         }
 
         public void StartAndFinalizeThematicBreak()
         {
-            var separator = ViewSupplier.GetThematicBreak();
+            var separator = ViewSupplier.CreateThematicBreak();
             StoreView(separator);
         }
 
         public void StartAndFinalizePlaceholderBlock(string placeholderName)
         {
-            var placeholderView = ViewSupplier.GetPlaceholder(placeholderName);
+            var placeholderView = ViewSupplier.CreatePlaceholder(placeholderName);
             StoreView(placeholderView);
         }
 
@@ -301,7 +301,7 @@ namespace MarkdownParser.Writer
             // multiple views combine a single stack layout
             var viewToStore = views.Count == 1
                 ? views[0]
-                : ViewSupplier.GetStackLayoutView(views);
+                : ViewSupplier.CreateStackLayoutView(views);
 
             return viewToStore;
         }
