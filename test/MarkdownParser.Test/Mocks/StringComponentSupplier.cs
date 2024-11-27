@@ -6,34 +6,34 @@ internal class StringComponentSupplier : IViewSupplier<string>
 {
     public MarkdownReferenceDefinition[]? MarkdownReferenceDefinitions { get; private set; }
 
-    public void RegisterReferenceDefinitions(IEnumerable<MarkdownReferenceDefinition> markdownReferenceDefinitions)
+    public void OnReferenceDefinitionsPublished(IEnumerable<MarkdownReferenceDefinition> markdownReferenceDefinitions)
     {
         MarkdownReferenceDefinitions = markdownReferenceDefinitions.ToArray();
     }
 
-    public string GetTextView(TextBlock textBlock)
+    public string CreateTextView(TextBlock textBlock)
     {
         var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"textview:{content}";
     }
 
-    public string GetBlockquotesView(string content)
+    public string CreateBlockquotesView(string content)
     {
         return $"blockquoteview>:{content}<blockquoteview";
     }
 
-    public string GetHeaderView(TextBlock textBlock, int headerLevel)
+    public string CreateHeaderView(TextBlock textBlock, int headerLevel)
     {
         var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"headerview:{headerLevel}:{content}";
     }
 
-    public string GetImageView(string url, string subscription, string imageId)
+    public string CreateImageView(string url, string subscription, string imageId)
     {
         return $"imageview:{url}:{subscription}";
     }
 
-    public string GetListView(List<string> items)
+    public string CreateListView(List<string> items)
     {
         // Each item will start with a '-'
         var listItems = items.Aggregate(string.Empty, (current, item) => current + $"-{item}");
@@ -41,47 +41,47 @@ internal class StringComponentSupplier : IViewSupplier<string>
         return $"listview>:{listItems}<listview";
     }
 
-    public string GetListItemView(string content, bool isOrderedList, int sequenceNumber, int listLevel)
+    public string CreateListItemView(string content, bool isOrderedList, int sequenceNumber, int listLevel)
     {
         return $"listitemview:_{isOrderedList}.{listLevel}.{sequenceNumber}_{content}";
     }
 
-    public string GetStackLayoutView(List<string> childViews)
+    public string CreateStackLayoutView(List<string> childViews)
     {
         var listItems = childViews.Aggregate(string.Empty, (current, item) => current + $"+{item}");
 
         return $"stackview>:{listItems}<stackview";
     }
 
-    public string GetThematicBreak()
+    public string CreateThematicBreak()
     {
         return "thematicbreakview";
     }
 
-    public string GetPlaceholder(string placeholderName)
+    public string CreatePlaceholder(string placeholderName)
     {
         return $"placeholderview:{placeholderName}";
     }
 
-    public string GetFencedCodeBlock(TextBlock textBlock, string codeInfo)
+    public string CreateFencedCodeBlock(TextBlock textBlock, string codeInfo)
     {
         var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"fencedcodeview>|({codeInfo})|{content}|<fencedcodeview";
     }
 
-    public string GetIndentedCodeBlock(TextBlock textBlock)
+    public string CreateIndentedCodeBlock(TextBlock textBlock)
     {
         var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"indentedview>|{content}|<indentedview";
     }
 
-    public string GetHtmlBlock(TextBlock textBlock)
+    public string CreateHtmlBlock(TextBlock textBlock)
     {
         var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);
         return $"htmlview>|{content}|<htmlview";
     }
 
-    public string GetReferenceDefinitions()
+    public string CreateReferenceDefinitions()
     {
         var content = "referencedefinitions>";
         foreach (var markdownReferenceDefinition in MarkdownReferenceDefinitions)
