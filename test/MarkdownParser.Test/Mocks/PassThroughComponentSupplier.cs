@@ -70,4 +70,9 @@ internal class PassThroughComponentSupplier : IViewSupplier<object>
     {
         return textBlock;
     }
+
+    public void Clear()
+    {
+        MarkdownReferenceDefinitions = [];
+    }
 }
