@@ -35,6 +35,8 @@ namespace MarkdownParser
         /// <returns></returns>
         public List<T> Parse(TextReader markdownSource)
         {
+            _viewSupplier.Clear();
+
             // Parse to usable c# objects
             var markdownDocument = GetMarkdownDocument(markdownSource);
 
