@@ -97,5 +97,10 @@ namespace MarkdownParser
         /// </summary>
         /// <returns></returns>
         T CreateHtmlBlock(TextBlock textBlock);
+
+        /// <summary>
+        /// clear all stored values to reuse the IViewSupplier
+        /// </summary>
+        void Clear();
     }
 }

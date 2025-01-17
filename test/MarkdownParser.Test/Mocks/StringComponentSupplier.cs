@@ -96,4 +96,9 @@ internal class StringComponentSupplier : IViewSupplier<string>
 
         return content;
     }
+
+    public void Clear()
+    {
+        MarkdownReferenceDefinitions = [];
+    }
 }
