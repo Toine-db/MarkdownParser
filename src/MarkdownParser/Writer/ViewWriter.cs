@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace MarkdownParser.Writer
         {
             Workbench.Push(new ViewWriterCache<T> { ComponentType = blockType });
         }
-
+        
         public void FinalizeParagraphBlock()
         {
             var wbi = GetWorkbenchItem();
@@ -89,9 +90,16 @@ namespace MarkdownParser.Writer
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = itemsCacheTuple.TextBlock != null
-                    ? ViewSupplier.CreateTextView(itemsCacheTuple.TextBlock)
-                    : itemsCacheTuple.Value;
+                T view;
+                if (itemsCacheTuple.TextBlock != null)
+                {
+                    itemsCacheTuple.TextBlock.AncestorsTree = GetAncestorsTreeFromWorkbench(BlockType.Paragraph);
+                    view = ViewSupplier.CreateTextView(itemsCacheTuple.TextBlock);
+                }
+                else
+                {
+                    view = itemsCacheTuple.Value;
+                }
 
                 if (view != null)
                 {
@@ -139,9 +147,16 @@ namespace MarkdownParser.Writer
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = itemsCacheTuple.TextBlock != null
-                    ? ViewSupplier.CreateHeaderView(itemsCacheTuple.TextBlock, headerLevel)
-                    : itemsCacheTuple.Value;
+                T view;
+                if (itemsCacheTuple.TextBlock != null)
+                {
+                    itemsCacheTuple.TextBlock.AncestorsTree = GetAncestorsTreeFromWorkbench(BlockType.Heading);
+                    view = ViewSupplier.CreateHeaderView(itemsCacheTuple.TextBlock, headerLevel);
+                }
+                else
+                {
+                    view = itemsCacheTuple.Value;
+                }
 
                 views.Add(view);
             }
@@ -187,9 +202,16 @@ namespace MarkdownParser.Writer
 
             foreach (var itemsCacheTuple in itemsCache)
             {
-                var view = itemsCacheTuple.TextBlock != null
-                    ? ViewSupplier.CreateTextView(itemsCacheTuple.TextBlock)
-                    : itemsCacheTuple.Value;
+                T view;
+                if (itemsCacheTuple.TextBlock != null)
+                {
+                    itemsCacheTuple.TextBlock.AncestorsTree = GetAncestorsTreeFromWorkbench(BlockType.List);
+                    view = ViewSupplier.CreateTextView(itemsCacheTuple.TextBlock);
+                }
+                else
+                {
+                    view = itemsCacheTuple.Value;
+                } 
 
                 if (view != null)
                 {
@@ -257,6 +279,7 @@ namespace MarkdownParser.Writer
         public void StartAndFinalizeFencedCodeBlock(StringContent content, string blockInfo)
         {
             var blocks = StringContentToBlocks(content);
+            blocks.AncestorsTree = GetAncestorsTreeFromWorkbench(BlockType.FencedCode);
 
             var blockView = ViewSupplier.CreateFencedCodeBlock(blocks, blockInfo);
             StoreView(blockView);
@@ -265,6 +288,7 @@ namespace MarkdownParser.Writer
         public void StartAndFinalizeIndentedCodeBlock(StringContent content)
         {
             var blocks = StringContentToBlocks(content);
+            blocks.AncestorsTree = GetAncestorsTreeFromWorkbench(BlockType.IndentedCode);
 
             var blockView = ViewSupplier.CreateIndentedCodeBlock(blocks);
             StoreView(blockView);
@@ -273,6 +297,7 @@ namespace MarkdownParser.Writer
         public void StartAndFinalizeHtmlBlock(StringContent content)
         {
             var blocks = StringContentToBlocks(content);
+            blocks.AncestorsTree = GetAncestorsTreeFromWorkbench(BlockType.Html);
 
             var blockView = ViewSupplier.CreateHtmlBlock(blocks);
             StoreView(blockView);
@@ -288,6 +313,56 @@ namespace MarkdownParser.Writer
         {
             var placeholderView = ViewSupplier.CreatePlaceholder(placeholderName);
             StoreView(placeholderView);
+        }
+
+        private BlockType[] GetAncestorsTreeFromWorkbench(BlockType currentBlockType)
+        {
+            var blockTypeTree = new List<BlockType>();
+            foreach (var workBenchItem in Workbench.Reverse())
+            {
+                switch (workBenchItem.ComponentType)
+                {
+                    case BlockTag.BlockQuote:
+                        blockTypeTree.Add(BlockType.Quote);
+                        break;
+                    case BlockTag.List:
+                        blockTypeTree.Add(BlockType.List);
+                        break;
+                    case BlockTag.FencedCode:
+                        blockTypeTree.Add(BlockType.FencedCode);
+                        break;
+                    case BlockTag.IndentedCode:
+                        blockTypeTree.Add(BlockType.IndentedCode);
+                        break;
+                    case BlockTag.HtmlBlock:
+                        blockTypeTree.Add(BlockType.Html);
+                        break;
+                    case BlockTag.Paragraph:
+                        blockTypeTree.Add(BlockType.Paragraph);
+                        break;
+                    case BlockTag.AtxHeading:
+                    case BlockTag.SetextHeading:
+                        blockTypeTree.Add(BlockType.Heading);
+                        break;
+                    case BlockTag.ListItem: // this is already covered by BlockTag.List
+                    case BlockTag.Document:
+                    case BlockTag.ThematicBreak:
+                    case BlockTag.ReferenceDefinition:
+                    case null:
+                    default:
+                        break;
+                }
+            }
+
+            // Add current BlockType as most recent Ancestor
+            // but skip Lists as current to prevent double List entries
+            // because current List and ListItem levels are already picked up from Workbench
+            if (currentBlockType != BlockType.List) 
+            {
+                blockTypeTree.Add(currentBlockType);
+            }
+
+            return blockTypeTree.ToArray();
         }
 
         private T StackViews(List<T> views)

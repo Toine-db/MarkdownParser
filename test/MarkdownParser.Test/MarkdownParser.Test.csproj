@@ -28,6 +28,10 @@
     <EmbeddedResource Include="Resources\Examples\Combined\basic-example.md" />
     <EmbeddedResource Include="Resources\Examples\Combined\full-example.md" />
     <EmbeddedResource Include="Resources\Examples\Combined\minimal-example.md" />
+    <EmbeddedResource Include="Resources\Examples\Sections\innerhtmlblocks.md" />
+    <EmbeddedResource Include="Resources\Examples\Sections\innercodeblocks.md" />
+    <EmbeddedResource Include="Resources\Examples\Sections\innernestedlist.md" />
+    <EmbeddedResource Include="Resources\Examples\Sections\innerblockquotes.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\codeblocks.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\headers.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\htmlblocks.md" />

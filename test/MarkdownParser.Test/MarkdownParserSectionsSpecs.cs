@@ -53,9 +53,9 @@ public class MarkdownParserSectionsSpecs
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         parseResult.Count.Should().Be(3);
-        parseResult[0].Should().StartWith("headerview:");
-        parseResult[1].Should().StartWith("headerview:");
-        parseResult[1].Should().StartWith("headerview:");
+        parseResult[0].Should().StartWith("headerview:1:");
+        parseResult[1].Should().StartWith("headerview:2:");
+        parseResult[2].Should().StartWith("headerview:3:");
     }
 
     [TestMethod]

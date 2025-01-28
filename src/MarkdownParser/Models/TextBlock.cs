@@ -6,6 +6,11 @@ namespace MarkdownParser.Models
     {
         public BaseSegment[] TextSegments { get; }
 
+        /// <summary>
+        /// Ancestors in order of (starting at 0) GrandParent > Parent > Sibling
+        /// </summary>
+        public BlockType[] AncestorsTree { get; internal set; }
+        
         public TextBlock(BaseSegment[] textSegments)
         {
             TextSegments = textSegments;
