@@ -51,11 +51,6 @@ internal class PassThroughComponentSupplier : IViewSupplier<object>
         return "ThematicBreak";
     }
 
-    public object CreatePlaceholder(string placeholderName)
-    {
-        return placeholderName;
-    }
-
     public object CreateFencedCodeBlock(TextBlock textBlock, string codeInfo)
     {
         return textBlock;

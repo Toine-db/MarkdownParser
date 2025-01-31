@@ -231,9 +231,14 @@ namespace MarkdownParser.Writer
             GetWorkbenchItem().Add(content, firstCharacterPosition);
         }
 
-        public void AddLink(Inline inline, int firstCharacterPosition, int length, string url, string urlTitle)
+        public void AddLink(int firstCharacterPosition, int length, string url, string urlTitle)
         {
             GetWorkbenchItem().AddLink(firstCharacterPosition, length, url, urlTitle);
+        }
+
+        public void AddPlaceholder(int firstCharacterPosition, int length, string url, string title)
+        {
+            GetWorkbenchItem().AddPlaceholder(firstCharacterPosition, length, url, title);
         }
 
         public void AddEmphasis(Inline inline, int firstCharacterPosition, int length)
@@ -308,13 +313,7 @@ namespace MarkdownParser.Writer
             var separator = ViewSupplier.CreateThematicBreak();
             StoreView(separator);
         }
-
-        public void StartAndFinalizePlaceholderBlock(string placeholderName)
-        {
-            var placeholderView = ViewSupplier.CreatePlaceholder(placeholderName);
-            StoreView(placeholderView);
-        }
-
+        
         private BlockType[] GetAncestorsTreeFromWorkbench(BlockType currentBlockType)
         {
             var blockTypeTree = new List<BlockType>();

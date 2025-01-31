@@ -74,13 +74,6 @@ namespace MarkdownParser
         T CreateThematicBreak();
 
         /// <summary>
-        /// a placeholder for views or other objects
-        /// </summary>
-        /// <param name="placeholderName">placeholder string</param>
-        /// <returns></returns>
-        T CreatePlaceholder(string placeholderName);
-
-        /// <summary>
         /// a view that shows fenced code (found in MD blocks starting with ```cs )
         /// </summary>
         /// <returns></returns>

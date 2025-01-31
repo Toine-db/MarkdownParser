@@ -7,8 +7,8 @@ namespace MarkdownParser.Models.Segments
         public string Url { get; }
         public string Title { get; }
 
-        public LinkSegment(SegmentIndicator indicator, SegmentIndicatorPosition indicatorPosition, string url, string title)
-            : base(indicator, indicatorPosition)
+        public LinkSegment(SegmentIndicatorPosition indicatorPosition, string url, string title)
+            : base(SegmentIndicator.Link, indicatorPosition)
         {
             Url = url;
             Title = title;

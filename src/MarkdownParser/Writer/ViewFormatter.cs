@@ -28,16 +28,20 @@ namespace MarkdownParser.Writer
             return _writer.Flush();
         }
 
+        private Dictionary<string, Reference> ReferenceMap;
+
         private void WriteBlockToView(Block block, ViewWriter<T> writer, bool continueWithNextSibling = true)
         {
-            if (block == null)
+            var tag = block?.Tag;
+            if (tag == null)
             {
                 return;
             }
 
-            switch (block.Tag)
+            switch (tag)
             {
                 case BlockTag.Document:
+                    ReferenceMap = block.Document.ReferenceMap;
                     _writer.RegisterReferenceDefinitions(block.Document.ReferenceMap);
                     WriteBlockToView(block.FirstChild, writer);
                     break;
@@ -81,7 +85,8 @@ namespace MarkdownParser.Writer
                     writer.StartAndFinalizeHtmlBlock(block.StringContent);
                     break;
                 case BlockTag.ReferenceDefinition:
-                    // ignore this tag, because it's handled before so the data can be used during the formatting
+                    // ignore this tag, because it's handled at 'BlockTag.Document' with 'RegisterReferenceDefinitions'
+                    // this way the data is available in time to be used during the formatting
                     break;
                 default:
                     throw new CommonMarkException("Block type " + block.Tag + " is not supported.", block);
@@ -95,12 +100,13 @@ namespace MarkdownParser.Writer
 
         private void WriteInlineToView(Inline inline, ViewWriter<T> writer)
         {
-            if (inline == null)
+            var tag = inline?.Tag;
+            if (tag == null)
             {
                 return;
             }
 
-            switch (inline.Tag)
+            switch (tag)
             {
                 case InlineTag.Code:
                     writer.AddEmphasis(inline, inline.SourcePosition, inline.SourceLength);
@@ -111,7 +117,7 @@ namespace MarkdownParser.Writer
                     writer.AddText(inline.LiteralContent, inline.SourcePosition);
                     break;
                 case InlineTag.Link:
-                    writer.AddLink(inline, inline.SourcePosition, inline.SourceLength, inline.TargetUrl, inline.LiteralContent); // check if this works at links
+                    writer.AddLink(inline.SourcePosition, inline.SourceLength, inline.TargetUrl, inline.LiteralContent); // check if this works at links
                     WriteInlineToView(inline.FirstChild, writer);
                     break;
                 case InlineTag.Image:
@@ -122,7 +128,7 @@ namespace MarkdownParser.Writer
                     writer.AddEmphasis(inline, inline.SourcePosition, inline.SourceLength);
                     break;
                 case InlineTag.Placeholder:
-                    writer.StartAndFinalizePlaceholderBlock(inline.TargetUrl);
+                    writer.AddPlaceholder(inline.SourcePosition, inline.SourceLength, inline.TargetUrl, inline.FirstChild.LiteralContent);
                     break;
                 case InlineTag.Strikethrough:
                 case InlineTag.Emphasis:

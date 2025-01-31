@@ -244,6 +244,6 @@ public class MarkdownParserSingleComponentSpecs
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         parseResult.Count.Should().Be(1);
-        parseResult.First().Should().Be("placeholderview:my-placeholder");
+        parseResult.First().Should().Be("textview:my-placeholder");
     }
 }
