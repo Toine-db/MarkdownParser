@@ -207,18 +207,12 @@ public class MarkdownParserSectionsSpecs
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         parseResult.Count.Should().Be(1);
-        parseResult[0].Should().StartWith("stackview>:+textview");
-
-        mockComponentSupplier.MarkdownReferenceDefinitions.Should().HaveCount(2);
+        parseResult[0].Should().StartWith("textview:Aliquet in luctus in porttitor non quam donec.");
+        mockComponentSupplier.MarkdownReferenceDefinitions.Should().HaveCount(1);
 
         mockComponentSupplier.MarkdownReferenceDefinitions[0].IsPlaceholder = false;
-        mockComponentSupplier.MarkdownReferenceDefinitions[0].Label = "LINK";
-        mockComponentSupplier.MarkdownReferenceDefinitions[0].Title = "title";
-        mockComponentSupplier.MarkdownReferenceDefinitions[0].Url = "/uri";
-
-        mockComponentSupplier.MarkdownReferenceDefinitions[1].IsPlaceholder = false;
-        mockComponentSupplier.MarkdownReferenceDefinitions[1].Label = "PORTTITOR NON QUAM";
-        mockComponentSupplier.MarkdownReferenceDefinitions[1].Title = "";
-        mockComponentSupplier.MarkdownReferenceDefinitions[1].Url = "https://lipsum.com/";
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].Label = "PORTTITOR NON QUAM";
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].Title = "lipsum";
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].Url = "https://lipsum.com/";
     }
 }

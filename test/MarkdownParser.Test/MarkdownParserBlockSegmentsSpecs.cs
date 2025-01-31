@@ -136,4 +136,66 @@ public class MarkdownParserBlockSegmentsSpecs
         textBlock1!.TextSegments[6].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Link);
         textBlock1!.TextSegments[6].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.End);
     }
+
+    [TestMethod]
+    public void When_parsing_text_with_placeholders_it_should_output_ordered_segments()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var markdown = FileReader.ReadFile("TextEmphasis.basic-placeholders.md");
+
+        var componentSupplier = new PassThroughComponentSupplier();
+        var parser = new MarkdownParser<object>(componentSupplier);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var parseResult = parser.Parse(markdown);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        parseResult.Count.Should().Be(3);
+
+        parseResult[0].Should().BeOfType<TextBlock>();
+        var textBlock0 = parseResult[0] as TextBlock;
+        textBlock0!.TextSegments.Length.Should().Be(3);
+        textBlock0!.TextSegments[0].As<TextSegment>().Text.Should().Be("Use ");
+        textBlock0!.TextSegments[1].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Placeholder);
+        textBlock0!.TextSegments[1].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.Start);
+        textBlock0!.TextSegments[1].As<PlaceholderSegment>().Title.Should().Be("placeholder x");
+        textBlock0!.TextSegments[1].As<PlaceholderSegment>().Url.Should().Be("placeholder x");
+        textBlock0!.TextSegments[1].As<PlaceholderSegment>().ToString().Should().Be("placeholder x");
+        textBlock0!.TextSegments[2].As<TextSegment>().Text.Should().Be(" within sentence.");
+
+        parseResult[1].Should().BeOfType<TextBlock>();
+        var textBlock1 = parseResult[1] as TextBlock;
+        textBlock1!.TextSegments.Length.Should().Be(10);
+        textBlock1!.TextSegments[0].As<TextSegment>().Text.Should().Be("Paragraphs ");
+        textBlock1!.TextSegments[1].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Strong);
+        textBlock1!.TextSegments[1].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.Start);
+        textBlock1!.TextSegments[2].As<TextSegment>().Text.Should().Be("are ");
+        textBlock1!.TextSegments[3].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Italic);
+        textBlock1!.TextSegments[3].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.Start);
+        textBlock1!.TextSegments[4].As<TextSegment>().Text.Should().Be("separated ");
+        textBlock1!.TextSegments[5].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Placeholder);
+        textBlock1!.TextSegments[5].As<PlaceholderSegment>().Title.Should().Be("placeholder y");
+        textBlock1!.TextSegments[5].As<PlaceholderSegment>().Url.Should().Be("placeholder y");
+        textBlock1!.TextSegments[5].As<PlaceholderSegment>().ToString().Should().Be("placeholder y");
+        textBlock1!.TextSegments[6].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Italic);
+        textBlock1!.TextSegments[6].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.End);
+        textBlock1!.TextSegments[7].As<TextSegment>().Text.Should().Be(" by");
+        textBlock1!.TextSegments[8].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Strong);
+        textBlock1!.TextSegments[8].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.End);
+        textBlock1!.TextSegments[9].As<TextSegment>().Text.Should().Be(" a blank line.");
+
+        parseResult[2].Should().BeOfType<TextBlock>();
+        var textBlock2 = parseResult[2] as TextBlock;
+        textBlock2!.TextSegments.Length.Should().Be(1);
+        textBlock2!.TextSegments[0].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Placeholder);
+        textBlock2!.TextSegments[0].As<PlaceholderSegment>().Title.Should().Be("placeholder z");
+        textBlock2!.TextSegments[0].As<PlaceholderSegment>().Url.Should().Be("placeholder z");
+        textBlock2!.TextSegments[0].As<PlaceholderSegment>().ToString().Should().Be("placeholder z");
+    }
 }

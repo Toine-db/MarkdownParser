@@ -40,6 +40,7 @@
     <EmbeddedResource Include="Resources\Examples\Sections\paragraphs.md" />
     <EmbeddedResource Include="Resources\Examples\Sections\referencedefinitions.md" />
     <EmbeddedResource Include="Resources\Examples\TextEmphasis\basic-links.md" />
+    <EmbeddedResource Include="Resources\Examples\TextEmphasis\basic-placeholders.md" />
     <EmbeddedResource Include="Resources\Examples\TextEmphasis\basic-text.md" />
   </ItemGroup>
 

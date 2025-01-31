@@ -8,6 +8,7 @@
         Strikethrough,
         Code,
         Link,
-        LineBreak
+        LineBreak,
+        Placeholder
     }
 }

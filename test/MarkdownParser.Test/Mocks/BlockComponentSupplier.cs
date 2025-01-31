@@ -64,11 +64,6 @@ internal class BlockComponentSupplier : IViewSupplier<string>
         return "thematicbreakview";
     }
 
-    public string CreatePlaceholder(string placeholderName)
-    {
-        return $"placeholderview:{placeholderName}";
-    }
-
     public string CreateFencedCodeBlock(TextBlock textBlock, string codeInfo)
     {
         var content = textBlock.ExtractLiteralContent(Settings.TextualLineBreak);

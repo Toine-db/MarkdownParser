@@ -260,7 +260,7 @@ public class MarkdownParserBlocksSpecs
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         parseResult.Count.Should().Be(1);
-        parseResult[0].Should().StartWith($"stackview>:+textview:[]{BlockType.Paragraph}");
+        parseResult[0].Should().StartWith($"textview:[]{BlockType.Paragraph}:Aliquet in luctus in porttitor non quam donec.");
     }
 
     [TestMethod]

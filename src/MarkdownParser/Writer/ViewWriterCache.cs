@@ -48,7 +48,15 @@ namespace MarkdownParser.Writer
 
             _pendingSegmentIndicators.Add((SegmentIndicator.Link, firstCharacterPosition + length - 1));
 
-            var segmentIndicator = new LinkSegment(SegmentIndicator.Link, SegmentIndicatorPosition.Start, url, urlTitle);
+            var segmentIndicator = new LinkSegment(SegmentIndicatorPosition.Start, url, urlTitle);
+            _valuesStack.Push((segmentIndicator, _defaultT));
+        }
+
+        public void AddPlaceholder(int firstCharacterPosition, int length, string url, string title)
+        {
+            FinalizeSegmentIndicator(firstCharacterPosition);
+
+            var segmentIndicator = new PlaceholderSegment(url, title);
             _valuesStack.Push((segmentIndicator, _defaultT));
         }
 
@@ -129,7 +137,7 @@ namespace MarkdownParser.Writer
                     switch (pendingIndicator.SegmentIndicator)
                     {
                         case SegmentIndicator.Link:
-                            segmentIndicator = new LinkSegment(pendingIndicator.SegmentIndicator, SegmentIndicatorPosition.End, string.Empty, string.Empty);
+                            segmentIndicator = new LinkSegment(SegmentIndicatorPosition.End, string.Empty, string.Empty);
                             break;
                         default:
                             segmentIndicator = new IndicatorSegment(pendingIndicator.SegmentIndicator, SegmentIndicatorPosition.End);
