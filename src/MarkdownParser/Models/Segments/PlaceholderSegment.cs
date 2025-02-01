@@ -4,21 +4,21 @@ namespace MarkdownParser.Models.Segments
 {
     public class PlaceholderSegment : IndicatorSegment
     {
-        public string Url { get; }
+        public string PlaceholderId { get; }
         public string Title { get; }
 
-        public PlaceholderSegment(string url, string title)
+        public PlaceholderSegment(string placeholderId, string title)
             : base(SegmentIndicator.Placeholder, SegmentIndicatorPosition.Start)
         {
-            Url = url;
+            PlaceholderId = placeholderId?.ToUpper();
             Title = title;
             HasLiteralContent = !string.IsNullOrWhiteSpace(Title) 
-                                && !string.IsNullOrWhiteSpace(Url);
+                                && !string.IsNullOrWhiteSpace(placeholderId);
         }
 
         public override string ToString()
         {
-            return Title ?? Url ?? string.Empty;
+            return Title ?? PlaceholderId ?? string.Empty;
         }
     }
 }
