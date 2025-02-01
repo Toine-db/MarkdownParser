@@ -165,7 +165,7 @@ public class MarkdownParserBlockSegmentsSpecs
         textBlock0!.TextSegments[1].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Placeholder);
         textBlock0!.TextSegments[1].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.Start);
         textBlock0!.TextSegments[1].As<PlaceholderSegment>().Title.Should().Be("placeholder x");
-        textBlock0!.TextSegments[1].As<PlaceholderSegment>().Url.Should().Be("placeholder x");
+        textBlock0!.TextSegments[1].As<PlaceholderSegment>().PlaceholderId.Should().Be("placeholder x".ToUpper());
         textBlock0!.TextSegments[1].As<PlaceholderSegment>().ToString().Should().Be("placeholder x");
         textBlock0!.TextSegments[2].As<TextSegment>().Text.Should().Be(" within sentence.");
 
@@ -181,7 +181,7 @@ public class MarkdownParserBlockSegmentsSpecs
         textBlock1!.TextSegments[4].As<TextSegment>().Text.Should().Be("separated ");
         textBlock1!.TextSegments[5].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Placeholder);
         textBlock1!.TextSegments[5].As<PlaceholderSegment>().Title.Should().Be("placeholder y");
-        textBlock1!.TextSegments[5].As<PlaceholderSegment>().Url.Should().Be("placeholder y");
+        textBlock1!.TextSegments[5].As<PlaceholderSegment>().PlaceholderId.Should().Be("placeholder y".ToUpper());
         textBlock1!.TextSegments[5].As<PlaceholderSegment>().ToString().Should().Be("placeholder y");
         textBlock1!.TextSegments[6].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Italic);
         textBlock1!.TextSegments[6].As<IndicatorSegment>().IndicatorPosition.Should().Be(SegmentIndicatorPosition.End);
@@ -195,7 +195,7 @@ public class MarkdownParserBlockSegmentsSpecs
         textBlock2!.TextSegments.Length.Should().Be(1);
         textBlock2!.TextSegments[0].As<IndicatorSegment>().Indicator.Should().Be(SegmentIndicator.Placeholder);
         textBlock2!.TextSegments[0].As<PlaceholderSegment>().Title.Should().Be("placeholder z");
-        textBlock2!.TextSegments[0].As<PlaceholderSegment>().Url.Should().Be("placeholder z");
+        textBlock2!.TextSegments[0].As<PlaceholderSegment>().PlaceholderId.Should().Be("placeholder z".ToUpper());
         textBlock2!.TextSegments[0].As<PlaceholderSegment>().ToString().Should().Be("placeholder z");
     }
 }

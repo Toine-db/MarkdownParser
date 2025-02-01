@@ -60,7 +60,7 @@ namespace MarkdownParser.Writer
                 markdownReferenceDefinition.Add(new MarkdownReferenceDefinition()
                 {
                     IsPlaceholder = referenceDefinition.Value.IsPlaceholder,
-                    Label = referenceDefinition.Value.Label,
+                    PlaceholderId = referenceDefinition.Value.Label,
                     Title = referenceDefinition.Value.Title,
                     Url = referenceDefinition.Value.Url
                 });

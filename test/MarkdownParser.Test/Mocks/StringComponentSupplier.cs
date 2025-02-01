@@ -82,7 +82,7 @@ internal class StringComponentSupplier : IViewSupplier<string>
         foreach (var markdownReferenceDefinition in MarkdownReferenceDefinitions)
         {
             content += $"|{markdownReferenceDefinition.IsPlaceholder}";
-            content += $"*{markdownReferenceDefinition.Label}";
+            content += $"*{markdownReferenceDefinition.PlaceholderId}";
             content += $"*{markdownReferenceDefinition.Title}";
             content += $"*{markdownReferenceDefinition.Url}";
         }

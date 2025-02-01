@@ -211,7 +211,7 @@ public class MarkdownParserSectionsSpecs
         mockComponentSupplier.MarkdownReferenceDefinitions.Should().HaveCount(1);
 
         mockComponentSupplier.MarkdownReferenceDefinitions[0].IsPlaceholder = false;
-        mockComponentSupplier.MarkdownReferenceDefinitions[0].Label = "PORTTITOR NON QUAM";
+        mockComponentSupplier.MarkdownReferenceDefinitions[0].PlaceholderId = "PORTTITOR NON QUAM";
         mockComponentSupplier.MarkdownReferenceDefinitions[0].Title = "lipsum";
         mockComponentSupplier.MarkdownReferenceDefinitions[0].Url = "https://lipsum.com/";
     }
