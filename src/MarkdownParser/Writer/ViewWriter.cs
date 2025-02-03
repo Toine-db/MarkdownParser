@@ -158,10 +158,16 @@ namespace MarkdownParser.Writer
                     view = itemsCacheTuple.Value;
                 }
 
-                views.Add(view);
+                if (view != null)
+                {
+                    views.Add(view);
+                }
             }
 
-            StoreView(StackViews(views));
+            if (views.Any())
+            {
+                StoreView(StackViews(views));
+            }
         }
 
         public void FinalizeListBlock()
