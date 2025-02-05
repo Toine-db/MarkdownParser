@@ -244,6 +244,11 @@ namespace MarkdownParser.Writer
 
         public void AddPlaceholder(int firstCharacterPosition, int length, string url, string title)
         {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return;
+            }
+
             GetWorkbenchItem().AddPlaceholder(firstCharacterPosition, length, url, title);
         }
 

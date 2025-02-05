@@ -246,4 +246,30 @@ public class MarkdownParserSingleComponentSpecs
         parseResult.Count.Should().Be(1);
         parseResult.First().Should().Be("textview:my-placeholder");
     }
+
+    [TestMethod]
+    public void When_parsing_a_empty_placeholder_it_should_not_output_placeholder()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var markdown = @"
+[ ]
+[]
+";
+
+        var mockComponentSupplier = new StringComponentSupplier();
+        var parser = new MarkdownParser<string>(mockComponentSupplier);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var parseResult = parser.Parse(markdown);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        parseResult.Count.Should().Be(1);
+        parseResult.First().Should().Be("textview:");
+    }
 }
