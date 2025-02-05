@@ -128,7 +128,7 @@ namespace MarkdownParser.Writer
                     writer.AddEmphasis(inline, inline.SourcePosition, inline.SourceLength);
                     break;
                 case InlineTag.Placeholder:
-                    writer.AddPlaceholder(inline.SourcePosition, inline.SourceLength, inline.TargetUrl, inline.FirstChild.LiteralContent);
+                    writer.AddPlaceholder(inline.SourcePosition, inline.SourceLength, inline.TargetUrl, inline.FirstChild?.LiteralContent);
                     break;
                 case InlineTag.Strikethrough:
                 case InlineTag.Emphasis:
